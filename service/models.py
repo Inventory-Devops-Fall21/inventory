@@ -34,8 +34,6 @@ class DataValidationError(Exception):
 
 class Inventory(db.Model):
     
-    app:Flask = None
-    
     # Inventory Schema
     
     id = db.Column(db.Integer, primary_key=True)
@@ -68,8 +66,11 @@ class Inventory(db.Model):
         db.session.commit()
 
     def delete(self):
-        pass
-
+        """Removes a product from the data store"""
+        logger.info("Deleting %s", self.name)
+        db.session.delete(self)
+        db.session.commit()
+        
     def serialize(self) -> dict:
         """Serializes an Inventory into a dictionary"""
         return {
@@ -108,7 +109,8 @@ class Inventory(db.Model):
 
     @classmethod
     def init_db(cls, app:Flask):
-        """Initializes the database session
+        """
+        Initializes the database session
 
         :param app: the Flask app
         :type data: Flask

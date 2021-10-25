@@ -191,3 +191,4 @@ class TestInventoryServer(unittest.TestCase):
 		updated_inv = resp.get_json()
 		self.assertEqual(updated_inv["quantity"], 50)
 		self.assertEqual(updated_inv["name"], "kindle-oasis")
+  

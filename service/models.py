@@ -34,6 +34,8 @@ class DataValidationError(Exception):
 
 class Inventory(db.Model):
     
+    app:Flask = None
+    
     # Inventory Schema
     
     id = db.Column(db.Integer, primary_key=True)

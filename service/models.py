@@ -13,7 +13,6 @@ name (string) - the name of the product
 quantity (int) - the quantity of the product
 
 """
-import flask
 import logging
 from enum import Enum
 from flask import Flask
@@ -34,6 +33,8 @@ class DataValidationError(Exception):
     pass
 
 class Inventory(db.Model):
+    
+    app:Flask = None
     
     # Inventory Schema
     

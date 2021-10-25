@@ -13,6 +13,7 @@ name (string) - the name of the product
 quantity (int) - the quantity of the product
 
 """
+import flask
 import logging
 from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
@@ -32,8 +33,6 @@ class DataValidationError(Exception):
     pass
 
 class Inventory(db.Model):
-    
-    app:Flask = None
     
     # Inventory Schema
     
@@ -56,6 +55,25 @@ class Inventory(db.Model):
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
+        
+    @classmethod
+    def find(cls, inventory_id:int):
+        """
+        Finds a Pet by it's ID
+        :param inventory_id: the id of the Product to find
+        :type product: int
+        :return: an instance with the inventory_id, or None if not found
+        :rtype: Product
+        """
+        logger.info("Processing lookup for inventory_id %s ...", inventory_id)
+        return cls.query.get(inventory_id)
+    
+    def delete(self):
+        """Removes a product from the data store"""
+        logger.info("Deleting %s", self.name)
+        db.session.delete(self)
+        db.session.commit()
+
 
     def serialize(self) -> dict:
         """Serializes an Inventory into a dictionary"""
@@ -92,7 +110,8 @@ class Inventory(db.Model):
 
     @classmethod
     def init_db(cls, app:Flask):
-        """Initializes the database session
+        """
+        Initializes the database session
 
         :param app: the Flask app
         :type data: Flask

@@ -13,6 +13,7 @@ name (string) - the name of the product
 quantity (int) - the quantity of the product
 
 """
+import flask
 import logging
 from enum import Enum
 from flask import Flask
@@ -33,8 +34,6 @@ class DataValidationError(Exception):
     pass
 
 class Inventory(db.Model):
-    
-    app:Flask = None
     
     # Inventory Schema
     
@@ -66,9 +65,13 @@ class Inventory(db.Model):
         if not self.id:
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
-
+    
     def delete(self):
-        pass
+        """Removes a product from the data store"""
+        logger.info("Deleting %s", self.name)
+        db.session.delete(self)
+        db.session.commit()
+
 
     def serialize(self) -> dict:
         """Serializes an Inventory into a dictionary"""
@@ -108,7 +111,8 @@ class Inventory(db.Model):
 
     @classmethod
     def init_db(cls, app:Flask):
-        """Initializes the database session
+        """
+        Initializes the database session
 
         :param app: the Flask app
         :type data: Flask

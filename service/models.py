@@ -17,6 +17,7 @@ import logging
 from enum import Enum
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from service import keys
 
 logger = logging.getLogger("flask.app")
 
@@ -36,11 +37,12 @@ class Inventory(db.Model):
     
     app:Flask = None
     
-    # Inventory Schema
-    
-    id = db.Column(db.Integer, primary_key=True)
+    # Inventory Schema //id
     name = db.Column(db.String(80), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    condition = db.Column(db.String(100)) #[old, new, used]
     quantity = db.Column(db.Integer)
+    restock_level = db.Column(db.Integer)
     
     ##################################################
     # INSTANCE METHODS
@@ -74,13 +76,16 @@ class Inventory(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def serialize(self) -> dict:
-        """Serializes an Inventory into a dictionary"""
+    def serialize(self):
+        """ Serializes an Inventory record into a dictionary """
         return {
-            "id": self.id,
-            "name": self.name,
-            "quantity": self.quantity,
+            keys.KEY_NAME: self.name,
+            keys.KEY_PID: self.id,
+            keys.KEY_QTY: self.quantity,
+            keys.KEY_LVL: self.restock_level,
+            keys.KEY_CND: self.condition,
         }
+
     
     def deserialize(self, data):
         """ 
@@ -89,22 +94,16 @@ class Inventory(db.Model):
             data (dict): A dictionary containing the Inventory data
         """
         try:
-            self.id = data["id"]
-            self.name = data["name"]
-            if isinstance(data["quantity"], int):
-                if data["quantity"] >= 0:
-                    self.quantity = data["quantity"]
-                else:
-                    raise DataValidationError("Invalid value for [quantity>=0]: " + data["quantity"])
-            else:
-                raise DataValidationError("Invalid type for int [quantity]: " + str(type(data["quantity"])))
-        except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " + error.args[0])
+            self.name = data[keys.KEY_NAME]
+            self.id = data[keys.KEY_PID]
+            self.quantity = data[keys.KEY_QTY]
+            self.restock_level = data[keys.KEY_LVL]
+            self.condition = data[keys.KEY_CND]
+            return self
         except KeyError as error:
-            raise DataValidationError("Invalid Inventory: missing " + error.args[0])
+            raise DataValidationError("Invalid Inventory record: missing " + error.args[0])
         except TypeError as error:
-            raise DataValidationError("Invalid Inventory: body of request contained bad or no data")
-        return self
+            raise DataValidationError("Invalid Inventory record: body contained bad or no data")
 
     ##################################################
     # CLASS METHODS
@@ -126,21 +125,21 @@ class Inventory(db.Model):
         db.create_all()  # make our sqlalchemy tables
     
     @classmethod
-    def all(cls) -> list:
+    def find_all(cls) -> list:
         """Returns all of the Inventory in the database"""
         logger.info("Processing all Inventory")
         return cls.query.all()
     
     @classmethod
-    def find(cls, inv_id:int):
+    def find_by_id(cls, id:int):
         """Find an Inventory by it's id
 
-        :param inv_id: the id of the Inventory to find
-        :type inv_id: int
+        :param id: the id of the Inventory to find
+        :type id: int
 
-        :return: an instance with the inv_id, or None if not found
+        :return: an instance with the id, or None if not found
         :rtype: Inventory
 
         """
-        logger.info("Processing lookup for id %s ...", inv_id)
-        return cls.query.get(inv_id)
+        logger.info("Processing lookup for id %s ...", id)
+        return cls.query.get(id)

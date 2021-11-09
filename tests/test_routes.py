@@ -17,6 +17,7 @@ from service import status  # HTTP Status Codes
 from service.models import db, init_db
 from service.routes import app
 from .factories import InventoryFactory
+from service import keys
 
 # Disable all but ciritcal errors during normal test run
 # uncomment for debugging failing tests
@@ -25,10 +26,10 @@ logging.disable(logging.CRITICAL)
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 DATABASE_URI = os.getenv(
     "DATABASE_URI",
-    "postgres://postgres:postgres@localhost:5432/postgres"
+    keys.DATABASE_URI_LOCAL
 )
 BASE_URL = "/inventory"
-CONTENT_TYPE_JSON = "application/json"
+CONTENT_TYPE_JSON = keys.KEY_CONTENT_TYPE_JSON
 
 ######################################################################
 #  T E S T   C A S E S

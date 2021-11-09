@@ -12,12 +12,12 @@ import logging
 import unittest
 from werkzeug.exceptions import NotFound
 from service.models import Inventory, DataValidationError, db
-from service import app
+from service import app, keys
 from .factories import InventoryFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI",
-    "postgres://postgres:postgres@localhost:5432/postgres"
+    keys.DATABASE_URI_LOCAL
 )
 
 ######################################################################
@@ -64,7 +64,7 @@ class TestInventoryModel(unittest.TestCase):
 
     def test_add_an_inventory(self):
         """Create an inventory and add it to the database"""
-        inv = Inventory.all()
+        inv = Inventory.find_all()
         self.assertEqual(inv, [])
         inv = Inventory(name="paper", quantity=100)
         self.assertTrue(inv != None)
@@ -72,7 +72,7 @@ class TestInventoryModel(unittest.TestCase):
         inv.create()
         # Asert that it was assigned an id and shows up in the database
         self.assertEqual(inv.id, 1)
-        invs = Inventory.all()
+        invs = Inventory.find_all()
         self.assertEqual(len(invs), 1)
     
     def test_serialize(self):
@@ -93,6 +93,7 @@ class TestInventoryModel(unittest.TestCase):
             "id": 1,
             "name": "flower",
             "quantity": 13,
+            "restock_level": 5
         }
         inventory = Inventory()
         inventory.deserialize(data)
@@ -136,9 +137,9 @@ class TestInventoryModel(unittest.TestCase):
             inv.create()
         logging.debug(invs)
         # make sure they got saved
-        self.assertEqual(len(Inventory.all()), 3)
+        self.assertEqual(len(Inventory.find_all()), 3)
         # find the 2nd inv in the list
-        inv = Inventory.find(invs[1].id) # Find
+        inv = Inventory.find_by_id(invs[1].id) # Find
         self.assertIsNot(inv, None)
         self.assertEqual(inv.id, invs[1].id)
         self.assertEqual(inv.name, invs[1].name)
@@ -151,7 +152,7 @@ class TestInventoryModel(unittest.TestCase):
             inv.create()
         logging.debug(invs)
         # make sure they got saved
-        all = Inventory.all()
+        all = Inventory.find_all()
         self.assertEqual(len(all), 3)
         # match all to invs
         all.sort(key=lambda x:x.id)
@@ -185,7 +186,7 @@ class TestInventoryModel(unittest.TestCase):
         self.assertEqual(inv.name, "kindle-oasis")
         # Fetch it back and make sure the id hasn't changed
         # but the data did change
-        invs = Inventory.all()
+        invs = Inventory.find_all()
         self.assertEqual(len(invs), 1)
         self.assertEqual(invs[0].id, 1)
         self.assertEqual(invs[0].quantity, 101)

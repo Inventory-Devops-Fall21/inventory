@@ -50,6 +50,8 @@ This repository contains all the work of the Inventory Squad as part of the Fall
   - cp dot-env-example .env
   - Adds to the environment variables
   - PORT specifies the port that the Flask App and honcho should start on
+- .cfignore
+  - Files to be ignored from CloudFoundry
 
 ## Starting the VM
 

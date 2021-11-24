@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies
         run: |
           # Chrome
-          # apt-get update
+          apt-get update
           # apt-get -qq install -y chromium-driver python3-selenium curl > /dev/null
           apt-get install -y curl
           # Python stuff

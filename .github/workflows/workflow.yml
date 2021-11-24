@@ -44,7 +44,7 @@ jobs:
         run: |
           # Chrome
           apt-get update
-          apt-get -qq install -y chromium-driver python3-selenium > /dev/null
+          apt-get -qq install -y chromium-driver python3-selenium curl > /dev/null
           # Python stuff
           python -m pip install --upgrade pip wheel
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi

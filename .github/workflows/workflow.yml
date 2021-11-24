@@ -46,7 +46,7 @@ jobs:
           echo "**** Installing Chrome Headless..."
           apt-get update
           apt-get -qq install -y chromium-driver curl > /dev/null
-          echo "Crhome driver located at:"
+          echo "Chrome driver located at:"
           which chromedriver
           # Python stuff
           echo "**** Installing Python Stuff..."

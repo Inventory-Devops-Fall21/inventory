@@ -5,6 +5,7 @@ Feature: The Inventory service back-end
     I need a RESTful product list service
     So that I can keep track of my inventory
 
+    # Runs for each scenario
     Background:
         Given the following inventory
             | name      | condition     | quantity | restock_level |
@@ -18,20 +19,22 @@ Feature: The Inventory service back-end
         Then I should see "Inventory REST API Service" in the title
         And I should not see "404 Not Found"
 
-# Scenario: Create a Pet
-#     When I visit the "Home Page"
-#     And I set the "Name" to "Happy"
-#     And I set the "Category" to "Hippo"
-#     And I select "False" in the "Available" dropdown
-#     And I press the "Create" button
-#     Then I should see the message "Success"
-#     When I copy the "Id" field
-#     And I press the "Clear" button
-#     Then the "Id" field should be empty
-#     And the "Name" field should be empty
-#     And the "Category" field should be empty
-#     When I paste the "Id" field
-#     And I press the "Retrieve" button
-#     Then I should see "Happy" in the "Name" field
-#     And I should see "Hippo" in the "Category" field
-#     And I should see "False" in the "Available" dropdown
+    Scenario: Create an Inventory
+        When I visit the "Home Page"
+        And I set the "Name" to "Banana"
+        And I set the "Quantity" to "20"
+        And I set the "Restock_level" to "10"
+        And I select "New" in the "Condition" dropdown
+        And I press the "Create" button
+        Then I should see the message "Success"
+        When I copy the "Id" field
+        And I press the "Clear" button
+        Then the "Id" field should be empty
+        And the "Name" field should be empty
+        And the "Condition" field should be empty
+        When I paste the "Id" field
+        And I press the "Retrieve" button
+        Then I should see "Banana" in the "Name" field
+        And I should see "20" in the "Quantity" field
+        And I should see "10" in the "Restock_level" field
+        And I should see "New" in the "Condition" dropdown

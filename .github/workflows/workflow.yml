@@ -43,8 +43,9 @@ jobs:
       - name: Install dependencies
         run: |
           # Chrome
-          apt-get update
-          apt-get -qq install -y chromium-driver python3-selenium curl > /dev/null
+          # apt-get update
+          # apt-get -qq install -y chromium-driver python3-selenium curl > /dev/null
+          apt-get install -y curl
           # Python stuff
           python -m pip install --upgrade pip wheel
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
@@ -55,13 +56,13 @@ jobs:
       - name: Upload code coverage
         uses: codecov/codecov-action@v2
 
-      # - name: Install Chrome Driver
-      #   run: |
-      #     # Chrome driver for Selenium
-      #     LATEST_CHROMEDRIVER_VERSION=`curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"`
-      #     curl "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O+
-      #     unzip chromedriver_linux64.zip -d ~/bin
-      #     chromedriver --version
+      - name: Install Chrome Driver
+        run: |
+          # Chrome driver for Selenium
+          LATEST_CHROMEDRIVER_VERSION=`curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"`
+          curl "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O+
+          unzip chromedriver_linux64.zip -d ~/bin
+          chromedriver --version
 
       - name: Running BDD
         run: |

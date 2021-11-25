@@ -42,6 +42,13 @@ def step_impl(context, element_name, text_string):
     element.clear()
     element.send_keys(text_string)
 
+@when(u'I set the "Id" to the first item in table')
+def step_impl(context):
+    element_id = ID_PREFIX + "id" # Looking for element "inv_id"
+    element = context.driver.find_element_by_id(element_id)
+    element.clear()
+    element.send_keys(context.ids[0]) # Send the id of the first item
+
 @when('I select "{text}" in the "{element_name}" dropdown')
 def step_impl(context, text, element_name):
     element_id = ID_PREFIX + element_name.lower()

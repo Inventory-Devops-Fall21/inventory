@@ -6,21 +6,19 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        $("#pet_id").val(res._id);
-        $("#pet_name").val(res.name);
-        $("#pet_category").val(res.category);
-        if (res.available == true) {
-            $("#pet_available").val("true");
-        } else {
-            $("#pet_available").val("false");
-        }
+        $("#inv_id").val(res.id);
+        $("#inv_name").val(res.name);
+        $("#inv_quantity").val(res.quantity);
+        $("#inv_restock_level").val(res.restock_level);
+        $("#inv_condition").val(res.condition);
     }
 
     /// Clears all form fields
     function clear_form_data() {
-        $("#pet_name").val("");
-        $("#pet_category").val("");
-        $("#pet_available").val("");
+        $("#inv_name").val("");
+        $("#inv_quantity").val("");
+        $("#inv_restock_level").val("");
+        $("#inv_condition").val("");
     }
 
     // Updates the flash message area
@@ -34,30 +32,31 @@ $(function () {
     // ****************************************
 
     $("#create-btn").click(function () {
-
-        var name = $("#pet_name").val();
-        var category = $("#pet_category").val();
-        var available = $("#pet_available").val() == "true";
+        var name = $("#inv_name").val();
+        var quantity = parseInt($("#inv_quantity").val(), 10); // Base 10
+        var restock_level = parseInt($("#inv_restock_level").val(), 10);
+        var condition = $("#inv_condition").val().toLowerCase();
 
         var data = {
             "name": name,
-            "category": category,
-            "available": available
+            "quantity": quantity,
+            "restock_level": restock_level,
+            "condition": condition
         };
 
         var ajax = $.ajax({
             type: "POST",
-            url: "/pets",
+            url: "/inventory",
             contentType: "application/json",
             data: JSON.stringify(data),
         });
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res)
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
     });
@@ -69,10 +68,10 @@ $(function () {
 
     $("#update-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
-        var name = $("#pet_name").val();
-        var category = $("#pet_category").val();
-        var available = $("#pet_available").val() == "true";
+        var inv_id = $("#inv_id").val();
+        var name = $("#inv_name").val();
+        var category = $("#inv_category").val();
+        var available = $("#inv_available").val() == "true";
 
         var data = {
             "name": name,
@@ -81,18 +80,18 @@ $(function () {
         };
 
         var ajax = $.ajax({
-                type: "PUT",
-                url: "/pets/" + pet_id,
-                contentType: "application/json",
-                data: JSON.stringify(data)
-            })
+            type: "PUT",
+            url: "/inventory/" + inv_id,
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             update_form_data(res)
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
 
@@ -103,27 +102,25 @@ $(function () {
     // ****************************************
 
     $("#retrieve-btn").click(function () {
-
-        var pet_id = $("#pet_id").val();
+        var inv_id = $("#inv_id").val();
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/pets/" + pet_id,
+            url: "/inventory/" + inv_id,
             contentType: "application/json",
             data: ''
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             //alert(res.toSource())
             update_form_data(res)
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             clear_form_data()
             flash_message(res.responseJSON.message)
         });
-
     });
 
     // ****************************************
@@ -132,21 +129,21 @@ $(function () {
 
     $("#delete-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
+        var inv_id = $("#inv_id").val();
 
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/pets/" + pet_id,
+            url: "/inventory/" + inv_id,
             contentType: "application/json",
             data: '',
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             clear_form_data()
             flash_message("Pet has been Deleted!")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message("Server error!")
         });
     });
@@ -156,7 +153,7 @@ $(function () {
     // ****************************************
 
     $("#clear-btn").click(function () {
-        $("#pet_id").val("");
+        $("#inv_id").val("");
         clear_form_data()
     });
 
@@ -166,9 +163,9 @@ $(function () {
 
     $("#search-btn").click(function () {
 
-        var name = $("#pet_name").val();
-        var category = $("#pet_category").val();
-        var available = $("#pet_available").val() == "true";
+        var name = $("#inv_name").val();
+        var category = $("#inv_category").val();
+        var available = $("#inv_available").val() == "true";
 
         var queryString = ""
 
@@ -192,12 +189,12 @@ $(function () {
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/pets?" + queryString,
+            url: "/inventory?" + queryString,
             contentType: "application/json",
             data: ''
         })
 
-        ajax.done(function(res){
+        ajax.done(function (res) {
             //alert(res.toSource())
             $("#search_results").empty();
             $("#search_results").append('<table class="table-striped" cellpadding="10">');
@@ -208,12 +205,12 @@ $(function () {
             header += '<th style="width:10%">Available</th></tr>'
             $("#search_results").append(header);
             var firstPet = "";
-            for(var i = 0; i < res.length; i++) {
-                var pet = res[i];
-                var row = "<tr><td>"+pet._id+"</td><td>"+pet.name+"</td><td>"+pet.category+"</td><td>"+pet.available+"</td></tr>";
+            for (var i = 0; i < res.length; i++) {
+                var inv = res[i];
+                var row = "<tr><td>" + inv._id + "</td><td>" + inv.name + "</td><td>" + inv.category + "</td><td>" + inv.available + "</td></tr>";
                 $("#search_results").append(row);
                 if (i == 0) {
-                    firstPet = pet;
+                    firstPet = inv;
                 }
             }
 
@@ -227,7 +224,7 @@ $(function () {
             flash_message("Success")
         });
 
-        ajax.fail(function(res){
+        ajax.fail(function (res) {
             flash_message(res.responseJSON.message)
         });
 

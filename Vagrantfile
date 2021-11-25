@@ -71,7 +71,7 @@ Vagrant.configure(2) do |config|
     end
   
     ############################################################
-    # Create a Python 3 environment for development work
+    # Create an environment for development work (Python3, Chromium, PostgreSQL)
     ############################################################
     config.vm.provision "shell", inline: <<-SHELL
       echo "****************************************"
@@ -84,6 +84,9 @@ Vagrant.configure(2) do |config|
       
       # Need PostgreSQL development library to compile on arm64
       apt-get install -y libpq-dev
+
+      # Install Chromium Driver
+      apt-get install -y chromium-driver
   
       # Create a Python3 Virtual Environment and Activate it in .profile
       sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'

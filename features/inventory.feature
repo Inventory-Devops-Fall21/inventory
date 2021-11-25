@@ -32,9 +32,11 @@ Feature: The Inventory service back-end
         Then the "Id" field should be empty
         And the "Name" field should be empty
         And the "Condition" field should be empty
+        # The following tests the Retrieve Function
         When I paste the "Id" field
         And I press the "Retrieve" button
-        Then I should see "Banana" in the "Name" field
+        Then I should see the message "Success"
+        And I should see "Banana" in the "Name" field
         And I should see "20" in the "Quantity" field
         And I should see "10" in the "Restock_level" field
         And I should see "New" in the "Condition" dropdown

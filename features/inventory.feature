@@ -41,10 +41,34 @@ Feature: The Inventory service back-end
         And I should see "New" in the "Condition" dropdown
 
     Scenario: Read an Inventory
-        When I set the "Id" to the first item in table
+        When I visit the "Home Page"
+        And I set the "Id" to the first item in table
         And I press the "Retrieve" button
         Then I should see the message "Success"
         And I should see "Chocolate" in the "Name" field
         And I should see "10" in the "Quantity" field
         And I should see "5" in the "Restock_level" field
         And I should see "New" in the "Condition" dropdown
+
+    Scenario: Update an Inventory
+        When I visit the "Home Page"
+        And I set the "Id" to the first item in table
+        And I press the "Retrieve" button
+        Then I should see the message "Success"
+        And I should see "Chocolate" in the "Name" field
+        And I should see "10" in the "Quantity" field
+        And I should see "5" in the "Restock_level" field
+        And I should see "New" in the "Condition" dropdown
+        When I change "Name" to "Banana"
+        And I select "Unknown" in the "Condition" dropdown
+        And I press the "Update" button
+        Then I should see the message "Success"
+        When I copy the "Id" field
+        And I press the "Clear" button
+        And I paste the "Id" field
+        And I press the "Retrieve" button
+        Then I should see the message "Success"
+        And I should see "Banana" in the "Name" field
+        And I should see "10" in the "Quantity" field
+        And I should see "5" in the "Restock_level" field
+        And I should see "Unknown" in the "Condition" dropdown

@@ -165,29 +165,30 @@ $(function () {
 
     $("#search-btn").click(function () {
 
-        var name = $("#inv_name").val();
-        var category = $("#inv_category").val();
-        var available = $("#inv_available").val() == "true";
+        // var name = $("#inv_name").val();
+        // var quantity = parseInt($("#inv_quantity").val(), 10); // Base 10
+        // var restock_level = parseInt($("#inv_restock_level").val(), 10);
+        // var condition = $("#inv_condition").val().toLowerCase();
 
         var queryString = ""
 
-        if (name) {
-            queryString += 'name=' + name
-        }
-        if (category) {
-            if (queryString.length > 0) {
-                queryString += '&category=' + category
-            } else {
-                queryString += 'category=' + category
-            }
-        }
-        if (available) {
-            if (queryString.length > 0) {
-                queryString += '&available=' + available
-            } else {
-                queryString += 'available=' + available
-            }
-        }
+        // if (name) {
+        //     queryString += 'name=' + name
+        // }
+        // if (category) {
+        //     if (queryString.length > 0) {
+        //         queryString += '&category=' + category
+        //     } else {
+        //         queryString += 'category=' + category
+        //     }
+        // }
+        // if (available) {
+        //     if (queryString.length > 0) {
+        //         queryString += '&available=' + available
+        //     } else {
+        //         queryString += 'available=' + available
+        //     }
+        // }
 
         var ajax = $.ajax({
             type: "GET",
@@ -201,26 +202,32 @@ $(function () {
             $("#search_results").empty();
             $("#search_results").append('<table class="table-striped" cellpadding="10">');
             var header = '<tr>'
-            header += '<th style="width:10%">ID</th>'
-            header += '<th style="width:40%">Name</th>'
-            header += '<th style="width:40%">Category</th>'
-            header += '<th style="width:10%">Available</th></tr>'
+            header += '<th style="width:20%">ID</th>'
+            header += '<th style="width:20%">Name</th>'
+            header += '<th style="width:20%">Quantity</th>'
+            header += '<th style="width:20%">Restock Level</th>'
+            header += '<th style="width:20%">Condition</th>'
             $("#search_results").append(header);
-            var firstPet = "";
+            var firstInv = "";
             for (var i = 0; i < res.length; i++) {
                 var inv = res[i];
-                var row = "<tr><td>" + inv._id + "</td><td>" + inv.name + "</td><td>" + inv.category + "</td><td>" + inv.available + "</td></tr>";
+                var row = "<tr><td>" + inv.id +
+                    "</td><td>" + inv.name +
+                    "</td><td>" + inv.quantity +
+                    "</td><td>" + inv.restock_level +
+                    "</td><td>" + inv.condition +
+                    "</td></tr>";
                 $("#search_results").append(row);
                 if (i == 0) {
-                    firstPet = inv;
+                    firstInv = inv;
                 }
             }
 
             $("#search_results").append('</table>');
 
             // copy the first result to the form
-            if (firstPet != "") {
-                update_form_data(firstPet)
+            if (firstInv != "") {
+                update_form_data(firstInv)
             }
 
             flash_message("Success")

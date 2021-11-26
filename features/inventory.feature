@@ -72,3 +72,12 @@ Feature: The Inventory service back-end
         And I should see "10" in the "Quantity" field
         And I should see "5" in the "Restock_level" field
         And I should see "Unknown" in the "Condition" dropdown
+
+    Scenario: List all Inventory
+        When I visit the "Home Page"
+        And I press the "Search" button
+        Then I should see "Chocolate" in the results
+        And I should see "iPhone" in the results
+        And I should see "Mug" in the results
+        And I should see "Computer" in the results
+        And I should not see "Banana" in the results

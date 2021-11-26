@@ -73,6 +73,15 @@ Feature: The Inventory service back-end
         And I should see "5" in the "Restock_level" field
         And I should see "Unknown" in the "Condition" dropdown
 
+    Scenario: Delete an Inventory
+        When I visit the "Home Page"
+        And I set the "Id" to the first item in table
+        And I press the "Delete" button
+        Then I should see the message "Success"
+        When I set the "Id" to the first item in table
+        And I press the "Retrieve" button
+        Then I should see the message "404 Not Found"
+        
     Scenario: List all Inventory
         When I visit the "Home Page"
         And I press the "Search" button

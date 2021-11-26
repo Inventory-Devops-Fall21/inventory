@@ -81,3 +81,12 @@ Feature: The Inventory service back-end
         When I set the "Id" to the first item in table
         And I press the "Retrieve" button
         Then I should see the message "404 Not Found"
+        
+    Scenario: List all Inventory
+        When I visit the "Home Page"
+        And I press the "Search" button
+        Then I should see "Chocolate" in the results
+        And I should see "iPhone" in the results
+        And I should see "Mug" in the results
+        And I should see "Computer" in the results
+        And I should not see "Banana" in the results

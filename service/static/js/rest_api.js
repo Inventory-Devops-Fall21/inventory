@@ -28,7 +28,7 @@ $(function () {
     }
 
     // ****************************************
-    // Create a Pet
+    // Create an Inventory
     // ****************************************
 
     $("#create-btn").click(function () {
@@ -63,20 +63,22 @@ $(function () {
 
 
     // ****************************************
-    // Update a Pet
+    // Update an Inventory
     // ****************************************
 
     $("#update-btn").click(function () {
 
         var inv_id = $("#inv_id").val();
         var name = $("#inv_name").val();
-        var category = $("#inv_category").val();
-        var available = $("#inv_available").val() == "true";
+        var quantity = parseInt($("#inv_quantity").val(), 10); // Base 10
+        var restock_level = parseInt($("#inv_restock_level").val(), 10);
+        var condition = $("#inv_condition").val().toLowerCase();
 
         var data = {
             "name": name,
-            "category": category,
-            "available": available
+            "quantity": quantity,
+            "restock_level": restock_level,
+            "condition": condition
         };
 
         var ajax = $.ajax({
@@ -98,7 +100,7 @@ $(function () {
     });
 
     // ****************************************
-    // Retrieve a Pet
+    // Retrieve an Inventory
     // ****************************************
 
     $("#retrieve-btn").click(function () {
@@ -124,7 +126,7 @@ $(function () {
     });
 
     // ****************************************
-    // Delete a Pet
+    // Delete an Inventory
     // ****************************************
 
     $("#delete-btn").click(function () {
@@ -158,7 +160,7 @@ $(function () {
     });
 
     // ****************************************
-    // Search for a Pet
+    // Search for an Inventory
     // ****************************************
 
     $("#search-btn").click(function () {

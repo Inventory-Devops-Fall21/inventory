@@ -25,6 +25,7 @@ def step_impl(context):
     
     # load the database with new inventory
     create_url = context.base_url + '/inventory'
+    context.ids = []
     for row in context.table:
         data = {
             "name": row['name'],
@@ -34,4 +35,6 @@ def step_impl(context):
         }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
+        data = context.resp.json()
+        context.ids.append(data["id"])
         expect(context.resp.status_code).to_equal(201)

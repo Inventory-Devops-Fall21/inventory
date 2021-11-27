@@ -115,3 +115,14 @@ Feature: The Inventory service back-end
         And I should see "Computer" in the results
         And I should not see "Chocolate" in the results
         And I should not see "Mug" in the results
+
+    Scenario: Add stock to an existing Inventory
+        When I visit the "Home Page"
+        And I set the "Id" to the first item in table
+        And I set the "Add Stock" to "20"
+        And I press the "Add Stock" button
+        Then I should see the message "Success"
+        When I set the "Id" to the first item in table
+        And I press the "Retrieve" button
+        Then I should see the message "Success"
+        And I should see "30" in the "Quantity" field

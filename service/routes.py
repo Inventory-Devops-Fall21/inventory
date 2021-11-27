@@ -165,7 +165,7 @@ def add_stock(id):
     """
     This endpoint will increase an Inventory stock based the body that is posted
     """
-    app.logger.info("Request to add_stock with id: {}", id)
+    app.logger.info("Request to add_stock with id: {}".format(id))
     check_content_type("application/json")
     inv = Inventory.find_by_id(id)
     if not inv:

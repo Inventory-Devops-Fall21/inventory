@@ -3,11 +3,10 @@ on:
   push:
     branches:
       - main
-      - "bdd_ui"
+
   pull_request:
     branches:
       - main
-      - "bdd_ui"
 
 jobs:
   build: # Job name

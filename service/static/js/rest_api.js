@@ -11,6 +11,7 @@ $(function () {
         $("#inv_quantity").val(res.quantity);
         $("#inv_restock_level").val(res.restock_level);
         $("#inv_condition").val(res.condition);
+        $("#inv_need_restock").val("");
     }
 
     /// Clears all form fields
@@ -19,6 +20,7 @@ $(function () {
         $("#inv_quantity").val("");
         $("#inv_restock_level").val("");
         $("#inv_condition").val("");
+        $("#inv_need_restock").val("");
     }
 
     // Updates the flash message area
@@ -165,31 +167,28 @@ $(function () {
 
     $("#search-btn").click(function () {
 
-        // var name = $("#inv_name").val();
-        // var quantity = parseInt($("#inv_quantity").val(), 10); // Base 10
-        // var restock_level = parseInt($("#inv_restock_level").val(), 10);
-        // var condition = $("#inv_condition").val().toLowerCase();
+        var name = $("#inv_name").val();
+        var condition = $("#inv_condition").val();
+        var need_restock = $("#inv_need_restock").val() == "true";
 
         var queryString = ""
-
-        // if (name) {
-        //     queryString += 'name=' + name
-        // }
-        // if (category) {
-        //     if (queryString.length > 0) {
-        //         queryString += '&category=' + category
-        //     } else {
-        //         queryString += 'category=' + category
-        //     }
-        // }
-        // if (available) {
-        //     if (queryString.length > 0) {
-        //         queryString += '&available=' + available
-        //     } else {
-        //         queryString += 'available=' + available
-        //     }
-        // }
-
+        if (name) {
+            queryString += 'name=' + name
+        }
+        if (condition) {
+            if (queryString.length > 0) {
+                queryString += '&condition=' + condition.toLowerCase()
+            } else {
+                queryString += 'condition=' + condition.toLowerCase()
+            }
+        }
+        if (need_restock) {
+            if (queryString.length > 0) {
+                queryString += '&need_restock=' + need_restock
+            } else {
+                queryString += 'need_restock=' + need_restock
+            }
+        }
         var ajax = $.ajax({
             type: "GET",
             url: "/inventory?" + queryString,

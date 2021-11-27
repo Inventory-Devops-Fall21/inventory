@@ -10,9 +10,10 @@ Feature: The Inventory service back-end
         Given the following inventory
             | name      | condition     | quantity | restock_level |
             | Chocolate | new           | 10       | 5             |
+            | Candy     | new           | 10       | 15            |
             | iPhone    | used          | 20       | 25            |
-            | Mug       | slightly_used | 30       | 30            |
-            | Computer  | unknown       | 50       | 20            |
+            | Mug       | slightly_used | 35       | 30            |
+            | Computer  | unknown       | 20       | 20            |
 
     Scenario: The server is running
         When I visit the "Home Page"
@@ -81,12 +82,36 @@ Feature: The Inventory service back-end
         When I set the "Id" to the first item in table
         And I press the "Retrieve" button
         Then I should see the message "404 Not Found"
-        
+
     Scenario: List all Inventory
         When I visit the "Home Page"
+        And I press the "Clear" button
         And I press the "Search" button
         Then I should see "Chocolate" in the results
+        And I should see "Candy" in the results
         And I should see "iPhone" in the results
         And I should see "Mug" in the results
         And I should see "Computer" in the results
         And I should not see "Banana" in the results
+
+    Scenario: Search all New conditions
+        When I visit the "Home Page"
+        And I press the "Clear" button
+        And I select "New" in the "Condition" dropdown
+        And I press the "Search" button
+        Then I should see "Chocolate" in the results
+        And I should see "Candy" in the results
+        And I should not see "iPhone" in the results
+        And I should not see "Mug" in the results
+        And I should not see "Computer" in the results
+
+    Scenario: Search all need restock
+        When I visit the "Home Page"
+        And I press the "Clear" button
+        And I select "True" in the "Need Restock" dropdown
+        And I press the "Search" button
+        Then I should see "Candy" in the results
+        And I should see "iPhone" in the results
+        And I should see "Computer" in the results
+        And I should not see "Chocolate" in the results
+        And I should not see "Mug" in the results

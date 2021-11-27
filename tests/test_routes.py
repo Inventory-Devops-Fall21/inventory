@@ -358,7 +358,7 @@ class TestInventoryServer(unittest.TestCase):
 		for i in range(0, len(invs)):
 			invs[i].create() 
 		resp = self.app.get(
-			BASE_URL, query_string="restock=1"
+			BASE_URL, query_string="need_restock=true"
 		)
 		self.assertEqual(resp.status_code, status.HTTP_200_OK) # OK
 		data = resp.get_json()

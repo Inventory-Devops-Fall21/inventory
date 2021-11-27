@@ -51,13 +51,13 @@ def list_inventory():
     invs = []
     name = request.args.get("name") # Query by name
     condition = request.args.get("condition") # Query by condition (string)
-    restock = request.args.get("restock") # Query by restock need
+    need_restock = request.args.get("need_restock") # Query by restock need
     if name:
         invs = Inventory.find_by_name(name)
     elif condition:
         condition_enum = getattr(Condition, condition)
         invs = Inventory.find_by_condition(condition_enum)
-    elif restock:
+    elif need_restock=="true":
         invs = Inventory.find_by_need_restock()
     else:
         invs = Inventory.find_all()

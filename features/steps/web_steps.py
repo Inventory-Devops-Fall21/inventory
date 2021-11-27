@@ -51,7 +51,7 @@ def step_impl(context):
 
 @when('I select "{text}" in the "{element_name}" dropdown')
 def step_impl(context, text, element_name):
-    element_id = ID_PREFIX + element_name.lower()
+    element_id = ID_PREFIX + "_".join(element_name.lower().split(" "))
     element = Select(context.driver.find_element_by_id(element_id))
     element.select_by_value(text.lower())
 

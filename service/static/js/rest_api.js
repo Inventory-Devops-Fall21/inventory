@@ -238,4 +238,36 @@ $(function () {
 
     });
 
+    // ****************************************
+    // Add Stock to an Inventory
+    // ****************************************
+
+    $("#add-stock-btn").click(function () {
+
+        var inv_id = $("#inv_id").val();
+        var add_stock = parseInt($("#inv_add_stock").val(), 10);
+
+
+        var data = {
+            "add_stock": add_stock
+        };
+
+        var ajax = $.ajax({
+            type: "PUT",
+            url: "/inventory/" + inv_id + "/add_stock",
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        })
+
+        ajax.done(function (res) {
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function (res) {
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
 })

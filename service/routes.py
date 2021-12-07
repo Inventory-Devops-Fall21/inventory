@@ -13,20 +13,20 @@ DELETE /inventory/{id} - deletes a inventory with a given id number
 # import os
 # import sys
 # import logging
+# from typing_extensions import Required
 from flask import Flask, jsonify, request, url_for, make_response, abort
-from . import status  # HTTP Status Codes
+from . import status, app  # HTTP Status Codes and Flask App
+from service.models import Inventory, Condition, DataValidationError, DatabaseConnectionError
 from werkzeug.exceptions import NotFound, BadRequest
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
-from flask_sqlalchemy import SQLAlchemy
-from service.models import Inventory, Condition
-
-# Import Flask application
-from . import app
+# from flask_sqlalchemy import SQLAlchemy
+from flask_restx import Api, Resource, fields, reqparse, inputs
 
 ######################################################################
 # GET INDEX
+# Configure the Root route before OpenAPI
 ######################################################################
 @app.route("/")
 def index():
@@ -40,6 +40,89 @@ def index():
     #     status.HTTP_200_OK,
     # )
     return app.send_static_file("index.html")
+
+######################################################################
+# Configure Swagger before initializing it
+######################################################################
+api = Api(app,
+    version='1.0.0',
+    title='Inventory REST API Service',
+    description='This is a sample Inventory server.',
+    default='inventory',
+    default_label='Inventory operations',
+    doc='/apidocs', 
+    prefix='/api' 
+)
+
+# Model from http requests
+http_request_model = api.model('Inventory', {
+    'name': fields.String(
+        required=True,
+        description='The name of the Inventory'),
+    'quantity': fields.Integer(
+        required=True,
+        description='The quantity of the Inventory'),
+    'restock_level': fields.Integer(
+        required=True,
+        description='The restock level of the Inventory'),
+    'condition': fields.String(
+        required=True,
+        enum=Condition._member_names_, 
+        description='The condition of the Inventory')
+})
+
+# Entire Inventory model
+inventory_model = api.inherit(
+    'InventoryModel', # Name of the model
+    http_request_model, # Inheritance
+    {
+        'id': fields.String(
+            readOnly=True, # Read only, database sets it
+            description='The unique id assigned internally by db service'),
+    }
+)
+
+# Possible URL args
+inv_args = reqparse.RequestParser()
+inv_args.add_argument('name', type=str, 
+    required=False, help='List Inventory by name')
+inv_args.add_argument('condition', type=str, 
+    required=False, help='List Inventory by condition')
+inv_args.add_argument('need_restock', type=inputs.boolean, 
+    required=False, help='List Inventory by whether it needs restock')
+
+######################################################################
+# Special Error Handlers
+######################################################################
+@api.errorhandler(DataValidationError)
+def request_validation_error(error):
+    """ Handles Value Errors from bad data """
+    message = str(error)
+    app.logger.error(message)
+    return {
+        'status_code': status.HTTP_400_BAD_REQUEST,
+        'error': 'Bad Request',
+        'message': message
+    }, status.HTTP_400_BAD_REQUEST
+
+@api.errorhandler(DatabaseConnectionError)
+def database_connection_error(error):
+    """ Handles Database Errors from connection attempts """
+    message = str(error)
+    app.logger.critical(message)
+    return {
+        'status_code': status.HTTP_503_SERVICE_UNAVAILABLE,
+        'error': 'Service Unavailable',
+        'message': message
+    }, status.HTTP_503_SERVICE_UNAVAILABLE
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+def abort(error_code: int, message: str):
+    """Logs errors before aborting"""
+    app.logger.error(message)
+    api.abort(error_code, message)
 
 ######################################################################
 # LIST ALL INVENTORY

@@ -76,7 +76,7 @@ inventory_model = api.inherit(
     'InventoryModel', # Name of the model
     http_request_model, # Inheritance
     {
-        'id': fields.String(
+        'id': fields.Integer(
             readOnly=True, # Read only, database sets it
             description='The unique id assigned internally by db service'),
     }
@@ -127,7 +127,7 @@ def abort(error_code: int, message: str):
 ######################################################################
 # LIST ALL INVENTORY
 ######################################################################
-@app.route("/inventory", methods=["GET"])
+@app.route("/api/inventory", methods=["GET"])
 def list_inventory():
     """ Returns all of the Inventory """
     app.logger.info("Request for inventory list")
@@ -151,7 +151,7 @@ def list_inventory():
 ######################################################################
 # RETRIEVE A INVENTORY
 ######################################################################
-@app.route("/inventory/<int:id>", methods=["GET"])
+@app.route("/api/inventory/<int:id>", methods=["GET"])
 def get_inventory(id):
     """
     Retrieve a single Inventory
@@ -166,30 +166,9 @@ def get_inventory(id):
     return make_response(jsonify(inventory.serialize()), status.HTTP_200_OK)
 
 ######################################################################
-# ADD A NEW INVENTORY
-######################################################################
-@app.route("/inventory", methods=["POST"])
-def create_inventory():
-    """
-    Creates an single Inventory
-    This endpoint will create a Inventory based the data in the body that is posted
-    """
-    app.logger.info("Request to create a inventory")
-    check_content_type("application/json")
-    inv = Inventory()
-    inv.deserialize(request.get_json())
-    inv.create()
-    location_url = url_for("get_inventory", id=inv.id, _external=True)
-
-    app.logger.info("Inventory with ID [%s] created.", inv.id)
-    return make_response(
-        jsonify(inv.serialize()), status.HTTP_201_CREATED, {"Location": location_url}
-    )
-
-######################################################################
 # UPDATE AN EXISTING INVENTORY
 ######################################################################
-@app.route("/inventory/<int:id>", methods=["PUT"])
+@app.route("/api/inventory/<int:id>", methods=["PUT"])
 def update_inventory(id):
     """
     Update an Inventory
@@ -210,7 +189,7 @@ def update_inventory(id):
 ######################################################################
 # DELETE A INVENTORY
 ######################################################################
-@app.route("/inventory/<int:id>", methods=["DELETE"])
+@app.route("/api/inventory/<int:id>", methods=["DELETE"])
 def delete_inventory(id):
     """
     Delete a Inventory
@@ -243,7 +222,7 @@ def check_content_type(media_type):
 ######################################################################
 # UPDATE AN EXISTING INVENTORY QUNATITY ACTION
 ######################################################################
-@app.route("/inventory/<int:id>/add_stock", methods=["PUT"])
+@app.route("/api/inventory/<int:id>/add_stock", methods=["PUT"])
 def add_stock(id):
     """
     This endpoint will increase an Inventory stock based the body that is posted
@@ -267,3 +246,35 @@ def add_stock(id):
     inv.update()
     app.logger.info("Inventory with ID [%s] updated.", inv.id)
     return make_response(jsonify(inv.serialize()), status.HTTP_200_OK)
+
+######################################################################
+#  PATH: /inventory
+######################################################################
+@api.route('/inventory', strict_slashes=False) # diff route, just /inventory
+class InvCollection(Resource):
+    """
+    Handles all interactions with collections of Inventory
+    """
+    #------------------------------------------------------------------
+    # ADD A NEW PET
+    #------------------------------------------------------------------
+    @api.doc('create_inventory')
+    @api.response(400, 'The posted data was not valid')
+    @api.expect(http_request_model)
+    @api.marshal_with(inventory_model, code=201)
+    def post(self):
+        """
+        Creates an single Inventory
+        This endpoint will create a Inventory based the data in the body that is posted
+        """
+        app.logger.info("Request to create a inventory")
+        app.logger.debug('Payload = %s', api.payload)
+        inv = Inventory()
+        inv.deserialize(api.payload) # Only accepts JSON
+        inv.create()
+        location_url = url_for("get_inventory", id=inv.id, _external=True) 
+        # _external means to generate an absolute UR, and not a relative URL
+        # since this url is going to be used to access the resource from outside
+        app.logger.info("Inventory with ID [%s] created.", inv.id)
+        # Only returns JSON
+        return inv.serialize(), status.HTTP_201_CREATED, {"Location": location_url}

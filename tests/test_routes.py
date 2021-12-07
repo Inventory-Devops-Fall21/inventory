@@ -87,7 +87,7 @@ class TestInventoryServer(unittest.TestCase):
 		# get the id of a inventory
 		test_inv = self._create_invs(1)[0] # One item
 		resp = self.app.get(
-			"/inventory/{}".format(test_inv.id), content_type=CONTENT_TYPE_JSON
+			BASE_URL + "/{}".format(test_inv.id), content_type=CONTENT_TYPE_JSON
 		)
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
 		data = resp.get_json()
@@ -99,7 +99,7 @@ class TestInventoryServer(unittest.TestCase):
 
 	def test_get_inventory_not_found(self):
 		"""Get a Inventory thats not found"""
-		resp = self.app.get("/inventory/0")
+		resp = self.app.get(BASE_URL + "/{}".format(0))
 		self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 	def test_create_inventory(self):
@@ -138,9 +138,9 @@ class TestInventoryServer(unittest.TestCase):
 		# DataValidationError = Bad request
 
 	def test_create_inventory_no_content_type(self):
-		"""Create a Inventory with no content type"""
+		"""Create a Inventory with no JSON data"""
 		resp = self.app.post(BASE_URL)
-		self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+		self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
 	def test_create_inventory_bad_quantity_type(self):
 		""" Create a Inventory with bad quantity type """
@@ -211,7 +211,7 @@ class TestInventoryServer(unittest.TestCase):
 		data["quantity"] = 50
 		data["name"] = "kindle-oasis"
 		resp = self.app.put(
-			"/inventory/{}".format(data["id"]),
+			BASE_URL + "/{}".format(data["id"]),
 			json=data,
 			content_type=CONTENT_TYPE_JSON,
 		)
@@ -228,7 +228,7 @@ class TestInventoryServer(unittest.TestCase):
 		# create an update request
 		new_inv = InventoryFactory()
 		resp = self.app.put(
-			"/inventory/{}".format(new_inv.id),
+			BASE_URL + "/{}".format(new_inv.id),
 			json=new_inv.serialize(),
 			content_type=CONTENT_TYPE_JSON,
 		)
@@ -247,7 +247,7 @@ class TestInventoryServer(unittest.TestCase):
 		new_inv = resp.get_json()
 		logging.debug(new_inv)
 		resp = self.app.delete(
-			"/inventory/{}".format(new_inv["id"]),
+			BASE_URL + "/{}".format(new_inv["id"]),
 			content_type=CONTENT_TYPE_JSON,
 		)
 		self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
@@ -257,7 +257,7 @@ class TestInventoryServer(unittest.TestCase):
 		"""Delete an Inventory that does not exist"""
 		# Delete the inv
 		resp = self.app.delete(
-			"/inventory/{}".format(10),
+			BASE_URL + "/{}".format(10),
 			content_type=CONTENT_TYPE_JSON,
 		)
 		self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
@@ -268,7 +268,7 @@ class TestInventoryServer(unittest.TestCase):
 		inv = self._create_invs(1)[0] # Create 1 inventory and added it to database
 		data = {"add_stock" : 50} # Create JSON for add_stock
 		resp = self.app.put( # Action to update stock
-			"/inventory/{}/add_stock".format(inv.id),
+			BASE_URL + "/{}/add_stock".format(inv.id),
 			json=data,
 			content_type=CONTENT_TYPE_JSON,
 		)
@@ -285,7 +285,7 @@ class TestInventoryServer(unittest.TestCase):
 		""""Increase the stock of a non-existing inventory"""
 		data = {"add_stock" : 50} # Create JSON for add_stock
 		resp = self.app.put( # Action to update stock
-			"/inventory/{}/add_stock".format(10),
+			BASE_URL + "/{}/add_stock".format(10),
 			json=data,
 			content_type=CONTENT_TYPE_JSON,
 		)
@@ -295,7 +295,7 @@ class TestInventoryServer(unittest.TestCase):
 		""""Increase the stock of an existing inventory without add_stock"""
 		inv = self._create_invs(1)[0] # Create 1 inventory and added it to database
 		resp = self.app.put( # Action to update stock
-			"/inventory/{}/add_stock".format(inv.id),
+			BASE_URL + "/{}/add_stock".format(inv.id),
 			json={},
 			content_type=CONTENT_TYPE_JSON,
 		)
@@ -306,7 +306,7 @@ class TestInventoryServer(unittest.TestCase):
 		inv = self._create_invs(1)[0] # Create 1 inventory and added it to database
 		data = {"add_stock" : -50} # Create JSON for add_stock
 		resp = self.app.put( # Action to update stock
-			"/inventory/{}/add_stock".format(inv.id),
+			BASE_URL + "/{}/add_stock".format(inv.id),
 			json=data,
 			content_type=CONTENT_TYPE_JSON,
 		)

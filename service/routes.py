@@ -47,15 +47,15 @@ def index():
 api = Api(app,
     version='1.0.0',
     title='Inventory REST API Service',
-    description='This is a sample Inventory server.',
-    default='inventory',
-    default_label='Inventory operations',
+    description='This is a simple Inventory server.',
+    default='Inventory',
+    default_label='Inventory Operations',
     doc='/apidocs', 
     prefix='/api' 
 )
 
 # Model from http requests
-http_request_model = api.model('Inventory', {
+inv_request_model = api.model('Inventory Request Model', {
     'name': fields.String(
         required=True,
         description='The name of the Inventory'),
@@ -73,8 +73,8 @@ http_request_model = api.model('Inventory', {
 
 # Entire Inventory model
 inventory_model = api.inherit(
-    'InventoryModel', # Name of the model
-    http_request_model, # Inheritance
+    'Inventory Response Model', # Name of the model
+    inv_request_model, # Inheritance
     {
         'id': fields.Integer(
             readOnly=True, # Read only, database sets it
@@ -147,23 +147,6 @@ def list_inventory():
     results = [inv.serialize() for inv in invs]
     app.logger.info("Returning %d invs", len(results))
     return make_response(jsonify(results), status.HTTP_200_OK)
-
-######################################################################
-# RETRIEVE A INVENTORY
-######################################################################
-@app.route("/api/inventory/<int:id>", methods=["GET"])
-def get_inventory(id):
-    """
-    Retrieve a single Inventory
-    This endpoint will return a Inventory based on it's id
-    """
-    app.logger.info("Request for inventory with id: %s", id)
-    inventory = Inventory.find_by_id(id)
-    if not inventory:
-        raise NotFound("Inventory with id '{}' was not found.".format(id))
-
-    app.logger.info("Returning Inventory: %s", inventory.name)
-    return make_response(jsonify(inventory.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # UPDATE AN EXISTING INVENTORY
@@ -253,28 +236,65 @@ def add_stock(id):
 @api.route('/inventory', strict_slashes=False) # diff route, just /inventory
 class InvCollection(Resource):
     """
-    Handles all interactions with collections of Inventory
+    Handles all interactions with a collection of Inventory
+
+    POST /inventory - Returns a Inventory with the id
+    GET /Inventory - Returns a list of Inventory
     """
     #------------------------------------------------------------------
-    # ADD A NEW PET
+    # CREATE A NEW INVENTORY
     #------------------------------------------------------------------
     @api.doc('create_inventory')
     @api.response(400, 'The posted data was not valid')
-    @api.expect(http_request_model)
+    @api.expect(inv_request_model)
     @api.marshal_with(inventory_model, code=201)
     def post(self):
         """
-        Creates an single Inventory
-        This endpoint will create a Inventory based the data in the body that is posted
+        Creates a single Inventory
+
+        This endpoint will create an Inventory based the data in the body that is posted
         """
         app.logger.info("Request to create a inventory")
         app.logger.debug('Payload = %s', api.payload)
         inv = Inventory()
         inv.deserialize(api.payload) # Only accepts JSON
         inv.create()
-        location_url = url_for("get_inventory", id=inv.id, _external=True) 
+        location_url = api.url_for(InvResource, inv_id=inv.id, _external=True)
         # _external means to generate an absolute UR, and not a relative URL
         # since this url is going to be used to access the resource from outside
         app.logger.info("Inventory with ID [%s] created.", inv.id)
         # Only returns JSON
         return inv.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
+
+######################################################################
+#  PATH: /inventory/{id}
+######################################################################
+@api.route('/inventory/<inv_id>')  # route for the class
+@api.param('inv_id', 'The Inventory ID')
+class InvResource(Resource):
+    """
+    Resource class
+
+    Allows the manipulation of a SINGLE Inventory
+    GET /inventory/{id} - Returns an Inventory with the id
+    PUT /inventory/{id} - Update an Inventory with the id
+    DELETE /inventory/{id} -  Deletes an Inventory with the id
+    """
+
+    #------------------------------------------------------------------
+    # RETRIEVE AN INVENTORY
+    #------------------------------------------------------------------
+    @api.doc('get_inventory') 
+    @api.response(404, 'Inventory not found') 
+    @api.marshal_with(inventory_model)
+    def get(self, inv_id):
+        """
+        Retrieve a single Inventory
+
+        This endpoint will return an Inventory based on it's id
+        """
+        app.logger.info("Request to Retrieve an Inventory with id [%s]", inv_id)
+        inv = Inventory.find_by_id(inv_id)
+        if not inv:
+            abort(status.HTTP_404_NOT_FOUND, "Inventory with id '{}' was not found.".format(inv_id))
+        return inv.serialize(), status.HTTP_200_OK

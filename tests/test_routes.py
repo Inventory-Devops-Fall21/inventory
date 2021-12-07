@@ -24,7 +24,7 @@ from config import DATABASE_URI
 # uncomment for debugging failing tests
 logging.disable(logging.CRITICAL)
 
-BASE_URL = "/inventory"
+BASE_URL = "/api/inventory"
 CONTENT_TYPE_JSON = "application/json"
 
 ######################################################################

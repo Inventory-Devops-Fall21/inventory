@@ -111,7 +111,6 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/api/inventory/" + inv_id,
-            contentType: "application/json",
             data: ''
         })
 
@@ -192,7 +191,6 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/api/inventory?" + queryString,
-            contentType: "application/json",
             data: ''
         })
 

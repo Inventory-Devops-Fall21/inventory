@@ -7,7 +7,8 @@ This repository contains all the work of the Inventory Squad as part of the Fall
 
 ## Cloud URL
 
-<https://nyu-inventory-service-fall2103.us-south.cf.appdomain.cloud/>
+* Dev: <https://nyu-inventory-service-fall2103-dev.us-south.cf.appdomain.cloud/>
+* Prod: <https://nyu-inventory-service-fall2103.us-south.cf.appdomain.cloud/>
 
 ## To contribute, checkout [contribution.md](./contributing.md)
 

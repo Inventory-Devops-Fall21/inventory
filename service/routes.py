@@ -223,6 +223,7 @@ class InvCollection(Resource):
 
     POST /inventory - Returns a Inventory with the id
     GET /Inventory - Returns a list of Inventory
+    DELETE /inventory/{id} - deletes a inventory with a given id number 
     """
     #------------------------------------------------------------------
     # CREATE A NEW INVENTORY
@@ -253,21 +254,18 @@ class InvCollection(Resource):
     # DELETE AN INVENTORY
     #------------------------------------------------------------------
     @api.doc('delete_inventory')
-    @api.response(400, 'The posted data was not valid')
-    @api.expect(inv_request_model)
-    @api.marshal_with(inventory_model, code=201)
+    @api.response(204, 'Inventory deleted')
     def delete_inventory(id):
         """
         Delete a Inventory
         This endpoint will delete a Inventory based the id specified in the path
         """
         app.logger.info("Request to delete the inventory with key {}".format(id))
-        check_content_type("application/json")
         inventory = Inventory.find_by_id(id)
         if inventory:
             inventory.delete()
-        app.logger.info("Inventory with id {} deleted".format(id))
-        return make_response("", status.HTTP_204_NO_CONTENT)
+            app.logger.info("Inventory with id {} deleted".format(id))
+        return '', status.HTTP_204_NO_CONTENT
 
 ######################################################################
 #  PATH: /inventory/{id}

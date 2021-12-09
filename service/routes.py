@@ -288,14 +288,14 @@ class InvResource(Resource):
     #------------------------------------------------------------------
     @api.doc('delete_inventory')
     @api.response(204, 'Inventory deleted')
-    def delete(id):
+    def delete(inv_id):
         """
         Delete a Inventory
         This endpoint will delete a Inventory based the id specified in the path
         """
-        app.logger.info("Request to delete the inventory with key {}".format(id))
-        inventory = Inventory.find_by_id(id)
+        app.logger.info("Request to delete the inventory with key {}".format(inv_id))
+        inventory = Inventory.find_by_id(inv_id)
         if inventory:
             inventory.delete()
-            app.logger.info("Inventory with id {} deleted".format(id))
+            app.logger.info("Inventory with id {} deleted".format(inv_id))
         return '', status.HTTP_204_NO_CONTENT

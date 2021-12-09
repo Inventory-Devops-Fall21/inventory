@@ -125,30 +125,6 @@ def abort(error_code: int, message: str):
     api.abort(error_code, message)
 
 ######################################################################
-# LIST ALL INVENTORY
-######################################################################
-@app.route("/api/inventory", methods=["GET"])
-def list_inventory():
-    """ Returns all of the Inventory """
-    app.logger.info("Request for inventory list")
-    invs = []
-    name = request.args.get("name") # Query by name
-    condition = request.args.get("condition") # Query by condition (string)
-    need_restock = request.args.get("need_restock") # Query by restock need
-    if name:
-        invs = Inventory.find_by_name(name)
-    elif condition:
-        condition_enum = getattr(Condition, condition)
-        invs = Inventory.find_by_condition(condition_enum)
-    elif need_restock=="true":
-        invs = Inventory.find_by_need_restock()
-    else:
-        invs = Inventory.find_all()
-    results = [inv.serialize() for inv in invs]
-    app.logger.info("Returning %d invs", len(results))
-    return make_response(jsonify(results), status.HTTP_200_OK)
-
-######################################################################
 # UPDATE AN EXISTING INVENTORY
 ######################################################################
 @app.route("/api/inventory/<int:id>", methods=["PUT"])
@@ -249,6 +225,38 @@ class InvCollection(Resource):
         app.logger.info("Inventory with ID [%s] created.", inv.id)
         # Only returns JSON
         return inv.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
+    
+    #------------------------------------------------------------------
+    # LIST ALL INVENTORY
+    #------------------------------------------------------------------
+    @api.doc('list_inventory')
+    @api.expect(inv_args, validate=True) # expect inv args and validate them
+    @api.marshal_list_with(inventory_model)
+    def get(self):
+        """ 
+        Returns all of the Inventory with matching query
+        
+        This endpoint will list Inventory based the query option in the args
+        """
+        app.logger.info("Request for inventory list")
+        invs = []
+        args = inv_args.parse_args()
+        if args['name']:
+            app.logger.info('Filtering by name: %s', args['name'])
+            invs = Inventory.find_by_name(args['name'])
+        elif args['condition']:
+            app.logger.info('Filtering by condition: %s', args['name'])
+            condition_enum = getattr(Condition, args['condition'])
+            invs = Inventory.find_by_condition(condition_enum)
+        elif args['need_restock']==True:
+            app.logger.info('Filtering by need restock')
+            invs = Inventory.find_by_need_restock()
+        else:
+            app.logger.info('Filtering by all')
+            invs = Inventory.find_all()
+        results = [inv.serialize() for inv in invs]
+        app.logger.info("Returning %d invs", len(results))
+        return results, status.HTTP_200_OK
 
 ######################################################################
 #  PATH: /inventory/{id}

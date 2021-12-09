@@ -250,23 +250,6 @@ class InvCollection(Resource):
         # Only returns JSON
         return inv.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
 
-    #------------------------------------------------------------------
-    # DELETE AN INVENTORY
-    #------------------------------------------------------------------
-    @api.doc('delete_inventory')
-    @api.response(204, 'Inventory deleted')
-    def delete(id):
-        """
-        Delete a Inventory
-        This endpoint will delete a Inventory based the id specified in the path
-        """
-        app.logger.info("Request to delete the inventory with key {}".format(id))
-        inventory = Inventory.find_by_id(id)
-        if inventory:
-            inventory.delete()
-            app.logger.info("Inventory with id {} deleted".format(id))
-        return '', status.HTTP_204_NO_CONTENT
-
 ######################################################################
 #  PATH: /inventory/{id}
 ######################################################################
@@ -299,3 +282,20 @@ class InvResource(Resource):
         if not inv:
             abort(status.HTTP_404_NOT_FOUND, "Inventory with id '{}' was not found.".format(inv_id))
         return inv.serialize(), status.HTTP_200_OK
+
+    #------------------------------------------------------------------
+    # DELETE AN INVENTORY
+    #------------------------------------------------------------------
+    @api.doc('delete_inventory')
+    @api.response(204, 'Inventory deleted')
+    def delete(id):
+        """
+        Delete a Inventory
+        This endpoint will delete a Inventory based the id specified in the path
+        """
+        app.logger.info("Request to delete the inventory with key {}".format(id))
+        inventory = Inventory.find_by_id(id)
+        if inventory:
+            inventory.delete()
+            app.logger.info("Inventory with id {} deleted".format(id))
+        return '', status.HTTP_204_NO_CONTENT

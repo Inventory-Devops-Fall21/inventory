@@ -255,7 +255,7 @@ class InvCollection(Resource):
     #------------------------------------------------------------------
     @api.doc('delete_inventory')
     @api.response(204, 'Inventory deleted')
-    def delete_inventory(id):
+    def delete(id):
         """
         Delete a Inventory
         This endpoint will delete a Inventory based the id specified in the path

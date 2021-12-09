@@ -138,8 +138,7 @@ $(function () {
         var ajax = $.ajax({
             type: "DELETE",
             url: "/api/inventory/" + inv_id,
-            contentType: "application/json",
-            data: '',
+                data: '',
         })
 
         ajax.done(function (res) {

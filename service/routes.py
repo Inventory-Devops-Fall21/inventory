@@ -170,23 +170,6 @@ def update_inventory(id):
     return make_response(jsonify(inv.serialize()), status.HTTP_200_OK)
 
 ######################################################################
-# DELETE A INVENTORY
-######################################################################
-@app.route("/api/inventory/<int:id>", methods=["DELETE"])
-def delete_inventory(id):
-    """
-    Delete a Inventory
-    This endpoint will delete a Inventory based the id specified in the path
-    """
-    app.logger.info("Request to delete the inventory with key {}".format(id))
-    check_content_type("application/json")
-    inventory = Inventory.find_by_id(id)
-    if inventory:
-        inventory.delete()
-    app.logger.info("Inventory with id {} deleted".format(id))
-    return make_response("", status.HTTP_204_NO_CONTENT)
-
-######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def check_content_type(media_type):
@@ -240,6 +223,7 @@ class InvCollection(Resource):
 
     POST /inventory - Returns a Inventory with the id
     GET /Inventory - Returns a list of Inventory
+    DELETE /inventory/{id} - deletes a inventory with a given id number 
     """
     #------------------------------------------------------------------
     # CREATE A NEW INVENTORY
@@ -298,3 +282,20 @@ class InvResource(Resource):
         if not inv:
             abort(status.HTTP_404_NOT_FOUND, "Inventory with id '{}' was not found.".format(inv_id))
         return inv.serialize(), status.HTTP_200_OK
+
+    #------------------------------------------------------------------
+    # DELETE AN INVENTORY
+    #------------------------------------------------------------------
+    @api.doc('delete_inventory')
+    @api.response(204, 'Inventory deleted')
+    def delete(self, inv_id):
+        """
+        Delete a Inventory
+        This endpoint will delete a Inventory based the id specified in the path
+        """
+        app.logger.info("Request to delete the inventory with key {}".format(inv_id))
+        inventory = Inventory.find_by_id(inv_id)
+        if inventory:
+            inventory.delete()
+            app.logger.info("Inventory with id {} deleted".format(inv_id))
+        return '', status.HTTP_204_NO_CONTENT

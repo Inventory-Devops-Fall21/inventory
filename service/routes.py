@@ -170,23 +170,6 @@ def update_inventory(id):
     return make_response(jsonify(inv.serialize()), status.HTTP_200_OK)
 
 ######################################################################
-# DELETE A INVENTORY
-######################################################################
-@app.route("/api/inventory/<int:id>", methods=["DELETE"])
-def delete_inventory(id):
-    """
-    Delete a Inventory
-    This endpoint will delete a Inventory based the id specified in the path
-    """
-    app.logger.info("Request to delete the inventory with key {}".format(id))
-    check_content_type("application/json")
-    inventory = Inventory.find_by_id(id)
-    if inventory:
-        inventory.delete()
-    app.logger.info("Inventory with id {} deleted".format(id))
-    return make_response("", status.HTTP_204_NO_CONTENT)
-
-######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def check_content_type(media_type):
@@ -265,6 +248,26 @@ class InvCollection(Resource):
         app.logger.info("Inventory with ID [%s] created.", inv.id)
         # Only returns JSON
         return inv.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
+
+    #------------------------------------------------------------------
+    # DELETE AN INVENTORY
+    #------------------------------------------------------------------
+    @api.doc('delete_inventory')
+    @api.response(400, 'The posted data was not valid')
+    @api.expect(inv_request_model)
+    @api.marshal_with(inventory_model, code=201)
+    def delete_inventory(id):
+        """
+        Delete a Inventory
+        This endpoint will delete a Inventory based the id specified in the path
+        """
+        app.logger.info("Request to delete the inventory with key {}".format(id))
+        check_content_type("application/json")
+        inventory = Inventory.find_by_id(id)
+        if inventory:
+            inventory.delete()
+        app.logger.info("Inventory with id {} deleted".format(id))
+        return make_response("", status.HTTP_204_NO_CONTENT)
 
 ######################################################################
 #  PATH: /inventory/{id}

@@ -246,7 +246,7 @@ class InvCollection(Resource):
     # LIST ALL INVENTORY
     #------------------------------------------------------------------
     @api.doc('list_inventory')
-    @api.expect(inv_args, validate=True) # expect pet args and validate them
+    @api.expect(inv_args, validate=True) # expect inv args and validate them
     @api.marshal_list_with(inventory_model)
     def get(self):
         """ 

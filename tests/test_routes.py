@@ -257,7 +257,6 @@ class TestInventoryServer(unittest.TestCase):
 		# Delete the inv
 		resp = self.app.delete(
 			BASE_URL + "/{}".format(10),
-			content_type=CONTENT_TYPE_JSON,
 		)
 		self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 		self.assertEqual(len(resp.data), 0)

@@ -15,7 +15,7 @@ import unittest
 from urllib.parse import quote_plus
 from service import status  # HTTP Status Codes
 from service.models import db, init_db
-from service.routes import app
+from service import app
 from .factories import InventoryFactory
 
 from config import DATABASE_URI

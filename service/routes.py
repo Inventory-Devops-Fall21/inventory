@@ -125,27 +125,6 @@ def abort(error_code: int, message: str):
     api.abort(error_code, message)
 
 ######################################################################
-# UPDATE AN EXISTING INVENTORY
-######################################################################
-@app.route("/api/inventory/<int:id>", methods=["PUT"])
-def update_inventory(id):
-    """
-    Update an Inventory
-    This endpoint will update an Inventory based the body that is posted
-    """
-    app.logger.info("Request to update inventory with id: %s", id)
-    check_content_type("application/json")
-    inv = Inventory.find_by_id(id)
-    if not inv:
-        raise NotFound("Inventory with id '{}' was not found.".format(id))
-    inv.deserialize(request.get_json())
-    inv.id = id
-    inv.update()
-
-    app.logger.info("Inventory with ID [%s] updated.", inv.id)
-    return make_response(jsonify(inv.serialize()), status.HTTP_200_OK)
-
-######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def check_content_type(media_type):
@@ -215,7 +194,7 @@ class InvCollection(Resource):
         This endpoint will create an Inventory based the data in the body that is posted
         """
         app.logger.info("Request to create a inventory")
-        app.logger.debug('Payload = %s', api.payload)
+        app.logger.debug('Payload = %s', api.payload) # payload = body of request
         inv = Inventory()
         inv.deserialize(api.payload) # Only accepts JSON
         inv.create()
@@ -307,3 +286,28 @@ class InvResource(Resource):
             inventory.delete()
             app.logger.info("Inventory with id {} deleted".format(inv_id))
         return '', status.HTTP_204_NO_CONTENT
+
+    #------------------------------------------------------------------
+    # UPDATE AN EXISTING PET
+    #------------------------------------------------------------------
+    @api.doc('update_inventory')
+    @api.response(404, 'Inventory not found')
+    @api.response(400, 'Inventory data invalid')
+    @api.expect(inv_request_model)
+    @api.marshal_with(inventory_model)
+    def put(self, inv_id):
+        """
+        Update an Inventory
+
+        This endpoint will update an Inventory based the body that is posted
+        """
+        app.logger.info('Request to Update an Inventory with id [%s]', inv_id)
+        inv = Inventory.find_by_id(inv_id)
+        if not inv:
+            abort(status.HTTP_404_NOT_FOUND, "Inventory with id '{}' was not found.".format(inv_id))
+        app.logger.debug('Payload = %s', api.payload)
+        inv.deserialize(api.payload)
+        inv.id = inv_id
+        inv.update()
+        app.logger.info("Inventory with ID [%s] updated.", inv.id)
+        return inv.serialize(), status.HTTP_200_OK

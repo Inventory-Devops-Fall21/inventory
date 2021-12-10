@@ -82,6 +82,16 @@ inventory_model = api.inherit(
     }
 )
 
+# Increase Inventory Model
+increase_model = api.model(
+    'Incrase Inventory Model', 
+    {
+    'add_stock': fields.Integer(
+        required=True,
+        description='The quantity to add to the Inventory'),
+    }
+)
+
 # Possible URL args
 inv_args = reqparse.RequestParser()
 inv_args.add_argument('name', type=str, 
@@ -160,34 +170,6 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         "Content-Type must be {}".format(media_type),
     )
-
-######################################################################
-# UPDATE AN EXISTING INVENTORY QUNATITY ACTION
-######################################################################
-@app.route("/api/inventory/<int:id>/add_stock", methods=["PUT"])
-def add_stock(id):
-    """
-    This endpoint will increase an Inventory stock based the body that is posted
-    """
-    app.logger.info("Request to add_stock with id: {}".format(id))
-    check_content_type("application/json")
-    inv = Inventory.find_by_id(id)
-    if not inv:
-        raise NotFound("Inventory with id '{}' was not found.".format(id))
-    
-    body = request.get_json()
-    if "add_stock" not in body.keys():
-        raise BadRequest("add_stock is missing from request body")
-        
-    quantity = body["add_stock"]
-    if (quantity < 0) or (not isinstance(quantity, int)): 
-        raise BadRequest("add_stock '{}' is of incorrect type or value".format(quantity))
-        # status.HTTP_400_BAD_REQUEST  
-          
-    inv.quantity += quantity
-    inv.update()
-    app.logger.info("Inventory with ID [%s] updated.", inv.id)
-    return make_response(jsonify(inv.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 #  PATH: /inventory
@@ -307,3 +289,43 @@ class InvResource(Resource):
             inventory.delete()
             app.logger.info("Inventory with id {} deleted".format(inv_id))
         return '', status.HTTP_204_NO_CONTENT
+
+######################################################################
+#  PATH: /inventory/{id}/increase
+######################################################################
+@api.route('/inventory/<inv_id>/increase')
+@api.param('inv_id', 'The Inventory ID')
+class AddStockResource(Resource): # action
+    """ 
+    Increase actions on an Inventory 
+    """
+
+    #------------------------------------------------------------------
+    # INCREASE AN INVENTORY STOCK
+    #------------------------------------------------------------------
+    @api.doc('increase_inventory')
+    @api.response(404, 'Inventory not found')
+    @api.response(400, 'Invalid quantity value')
+    @api.expect(increase_model, validate=True)
+    @api.marshal_with(inventory_model)
+    def put(self, inv_id):
+        """
+        Increase inventory stock
+
+        This endpoint will increase inventory stocks
+        """
+        quantity = api.payload["add_stock"]
+        app.logger.info('Request to increases inventory [{}] stock by [{}]'.format(inv_id, quantity))
+
+        inv = Inventory.find_by_id(inv_id)
+        if not inv:
+            abort(status.HTTP_404_NOT_FOUND, 'Inventory with id [{}] was not found.'.format(inv_id))
+        
+        if (quantity < 0):
+            abort(status.HTTP_400_BAD_REQUEST, 'Quantity with value [{}] is invalid.'.format(quantity))
+
+        inv.quantity += quantity
+        inv.update()
+
+        app.logger.info('Inventory with id [{}] stock increased successfully'.format(inv_id))
+        return inv.serialize(), status.HTTP_200_OK

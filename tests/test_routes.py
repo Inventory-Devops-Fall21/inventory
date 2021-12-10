@@ -266,7 +266,7 @@ class TestInventoryServer(unittest.TestCase):
 		inv = self._create_invs(1)[0] # Create 1 inventory and added it to database
 		data = {"add_stock" : 50} # Create JSON for add_stock
 		resp = self.app.put( # Action to update stock
-			BASE_URL + "/{}/add_stock".format(inv.id),
+			BASE_URL + "/{}/increase".format(inv.id),
 			json=data,
 			content_type=CONTENT_TYPE_JSON,
 		)
@@ -283,7 +283,7 @@ class TestInventoryServer(unittest.TestCase):
 		""""Increase the stock of a non-existing inventory"""
 		data = {"add_stock" : 50} # Create JSON for add_stock
 		resp = self.app.put( # Action to update stock
-			BASE_URL + "/{}/add_stock".format(10),
+			BASE_URL + "/{}/increase".format(10),
 			json=data,
 			content_type=CONTENT_TYPE_JSON,
 		)
@@ -293,18 +293,18 @@ class TestInventoryServer(unittest.TestCase):
 		""""Increase the stock of an existing inventory without add_stock"""
 		inv = self._create_invs(1)[0] # Create 1 inventory and added it to database
 		resp = self.app.put( # Action to update stock
-			BASE_URL + "/{}/add_stock".format(inv.id),
+			BASE_URL + "/{}/increase".format(inv.id),
 			json={},
 			content_type=CONTENT_TYPE_JSON,
 		)
 		self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 	
 	def test_add_stock_bad_value(self):
-		""""Increase the stock of an existing inventory"""
+		""""Increase the stock with a bad value"""
 		inv = self._create_invs(1)[0] # Create 1 inventory and added it to database
 		data = {"add_stock" : -50} # Create JSON for add_stock
 		resp = self.app.put( # Action to update stock
-			BASE_URL + "/{}/add_stock".format(inv.id),
+			BASE_URL + "/{}/increase".format(inv.id),
 			json=data,
 			content_type=CONTENT_TYPE_JSON,
 		)

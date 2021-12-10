@@ -137,7 +137,7 @@ $(function () {
         var ajax = $.ajax({
             type: "DELETE",
             url: "/api/inventory/" + inv_id,
-                data: '',
+            data: '',
         })
 
         ajax.done(function (res) {
@@ -251,7 +251,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "PUT",
-            url: "/api/inventory/" + inv_id + "/add_stock",
+            url: "/api/inventory/" + inv_id + "/increase",
             contentType: "application/json",
             data: JSON.stringify(data)
         })

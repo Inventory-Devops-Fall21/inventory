@@ -288,7 +288,7 @@ class InvResource(Resource):
         return '', status.HTTP_204_NO_CONTENT
 
     #------------------------------------------------------------------
-    # UPDATE AN EXISTING PET
+    # UPDATE AN EXISTING INVENTORY
     #------------------------------------------------------------------
     @api.doc('update_inventory')
     @api.response(404, 'Inventory not found')

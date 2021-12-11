@@ -292,6 +292,7 @@ class InvResource(Resource):
         inv.id = inv_id
         inv.update()
         app.logger.info("Inventory with ID [%s] updated.", inv.id)
+        return inv.serialize(), status.HTTP_200_OK
 
 ######################################################################
 #  PATH: /inventory/{id}/increase

@@ -136,8 +136,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/api/inventory/" + inv_id,
-            data: '',
+            url: "/api/inventory/" + inv_id
         })
 
         ajax.done(function (res) {

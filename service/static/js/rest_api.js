@@ -250,7 +250,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "PUT",
-            url: "/api/inventory/" + inv_id + "/add_stock",
+            url: "/api/inventory/" + inv_id + "/increase",
             contentType: "application/json",
             data: JSON.stringify(data)
         })

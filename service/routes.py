@@ -16,13 +16,13 @@ DELETE /inventory/{id} - deletes a inventory with a given id number
 # from typing_extensions import Required
 # from flask import Flask, jsonify, request, url_for, make_response, abort
 from . import status, app  # HTTP Status Codes and Flask App
-from service.models import Inventory, Condition, DataValidationError, DatabaseConnectionError
+from service.models import Inventory, Condition
+from flask_restx import Api, Resource, fields, reqparse, inputs
 # from werkzeug.exceptions import NotFound, BadRequest
 
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 # from flask_sqlalchemy import SQLAlchemy
-from flask_restx import Api, Resource, fields, reqparse, inputs
 
 ######################################################################
 # GET INDEX

@@ -384,3 +384,10 @@ class TestInventoryServer(unittest.TestCase):
 		for inv in data:
 			# Check the condition just to be sure
 			self.assertEqual(inv["condition"], test_condition.name)
+	
+	def test_invalid_method(self):
+		"""Invalid method should return 405"""
+		resp = self.app.get(
+			BASE_URL + "/{}/increase".format(0)
+		)
+		self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
